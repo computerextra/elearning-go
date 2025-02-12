@@ -38,7 +38,7 @@ func must[T any](x T, err error) T {
 func New(logger *slog.Logger, config Config, files fs.FS) (*App, error) {
 	redisURL, ok := os.LookupEnv("REDIS_URL")
 	if !ok {
-		return nil, fmt.Errorf("Must set redis URL")
+		return nil, fmt.Errorf("must set redis URL")
 	}
 
 	cfg, err := redis.ParseURL(redisURL)
