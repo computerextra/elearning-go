@@ -6,12 +6,13 @@ live/templ:
 
 # run air to detect any go file changes to re-build and re-run the server
 live/server:
-	go run github.com/cosmtrek/air@v1.51.0
-	--build.full_bin "go build -o tmp/bin/main.exe" --build.bin "tmp/bin/main.exe" --build.delay "100" \
-	--build.exclude_dir "node_modules" \
-	--build.include_ext "go" \
-	--build.stop_on_error "false" \
-	--misc.clean_on_exit true
+	go run github.com/cosmtrek/air@v1.51.0 
+# \
+# --build.full_bin "go build -o ./tmp/bin/main.exe" --build.bin "./tmp/bin/main.exe" --build.delay "100" \
+# --build.exclude_dir "node_modules" \
+# --build.include_ext "go" \
+# --build.stop_on_error false \
+# --misc.clean_on_exit true
 
 # run tailwindcss to generate style.css bundle in watch mode
 live/tailwind:
@@ -21,7 +22,7 @@ live/tailwind:
 live/sync_assets:
 	go run github.com/cosmtrek/air@v1.51.0 \
 	--build.cmd "templ generate --notify-proxy" \
-	--build.bin "true" \
+	--build.bin true \
 	--build.delay "100" \
 	--build.exclude_dir "" \
 	--build.exclude_dir "node_modules" \
