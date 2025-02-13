@@ -25,6 +25,7 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
 	routes.GetRoutes(router)
+	routes.GetApiRoutes(router)
 
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},

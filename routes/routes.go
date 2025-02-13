@@ -13,3 +13,5 @@ func GetRoutes(router *mux.Router) {
 	router.Handle("/", handler.Component(templates.Index()))
 
 }
+
+func GetApiRoutes(router *mux.Router) {}
