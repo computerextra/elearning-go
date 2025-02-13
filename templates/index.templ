@@ -1,24 +1,9 @@
 package templates
 
-templ page() {
-	<!DOCTYPE html>
-	<html lang="de">
-		<head>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>Datenschutz Training</title>
-			<link href="/static/css/style.css" rel="stylesheet"/>
-		</head>
-		<body>
-			<main>
-				{ children... }
-			</main>
-		</body>
-	</html>
-}
+import "computerextra/elaerning-go/components"
 
 templ Index() {
-	@page() {
+	@components.MainLayout("") {
 		<div>
 			<h1>Halloo Mensch</h1>
 		</div>
