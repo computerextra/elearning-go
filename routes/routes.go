@@ -4,6 +4,8 @@ import (
 	"computerextra/elaerning-go/db"
 	"computerextra/elaerning-go/handler"
 	"computerextra/elaerning-go/templates"
+	"fmt"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -22,8 +24,17 @@ func GetRoutes(router *mux.Router, client *db.PrismaClient) {
 	// fmt.Printf("created post: %s\n", result)
 
 	// Main Route
+
 	router.Handle("/", handler.Component(templates.Index()))
 
+	// Session Routes
+	router.HandleFunc("/login", loginHandler).Methods(http.MethodGet, http.MethodPost)
+	router.Handle("/dashboard", authMiddleware(http.HandlerFunc(homeHandler))).Methods(http.MethodGet)
+
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Welcome to the home page!")
 }
 
 func GetApiRoutes(router *mux.Router, client *db.PrismaClient) {}
