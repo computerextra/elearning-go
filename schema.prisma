@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator db {
+    provider = "go run github.com/steebchen/prisma-client-go"
+}
+
+datasource db {
+    provider = "mysql"
+    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+    phone         String?
+    role          String    @default("User")
+    password      String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Enrollment Enrollment[]
+    Result     Result[]
+}
+
+model Info {
+    id            String          @id @default(cuid())
+    name          String
+    description   String
+    body          String          @db.Text
+    readtime      String?
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+    CourseContent CourseContent[]
+}
+
+model Course {
+    id            String          @id @default(cuid())
+    name          String
+    description   String?
+    CourseContent CourseContent[]
+    Enrollment    Enrollment[]
+    Result        Result[]
+    Quiz          Quiz[]
+    createdAt     DateTime        @default(now())
+}
+
+model CourseContent {
+    id       String  @id @default(cuid())
+    type     String // Type of Content like video, document etc.
+    info     Info?   @relation(fields: [infoId], references: [id], onDelete: Cascade)
+    url      String?
+    course   Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    infoId   String?
+    courseId String
+}
+
+model Enrollment {
+    id               String   @id @default(cuid())
+    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    enrollmentDate   DateTime @default(now())
+    completionStatus String
+    userId           String
+    courseId         String
+}
+
+model Result {
+    id       String @id @default(cuid())
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    quiz     Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+    score    Int
+    userId   String
+    courseId String
+    quizId   String
+}
+
+model Quiz {
+    id          String   @id @default(cuid())
+    course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    name        String
+    description String
+    totalMarks  Int
+    Result      Result[]
+    courseId    String
+}

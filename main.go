@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"computerextra/elaerning-go/db"
 	"computerextra/elaerning-go/env"
 	"computerextra/elaerning-go/routes"
 
@@ -22,10 +23,21 @@ func main() {
 	flag.StringVar(&dir, "dir", "./static", "the directory to serve files from. Defaults to the current dir")
 	flag.Parse()
 
+	// Get DB Client
+	client := db.NewClient()
+	if err := client.Prisma.Connect(); err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := client.Prisma.Disconnect(); err != nil {
+			panic(err)
+		}
+	}()
+
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
-	routes.GetRoutes(router)
-	routes.GetApiRoutes(router)
+	routes.GetRoutes(router, client)
+	routes.GetApiRoutes(router, client)
 
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},

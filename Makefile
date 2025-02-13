@@ -14,6 +14,13 @@ live/server:
 # --build.stop_on_error false \
 # --misc.clean_on_exit true
 
+# generate db
+db/generate:
+	go run github.com/steebchen/prisma-client-go generate
+
+db/push:
+	go run github.com/steebchen/prisma-client-go db push
+
 # run tailwindcss to generate style.css bundle in watch mode
 live/tailwind:
 	pnpm tailwindcss -i ./static/css/input.css -o ./static/css/style.css --minify --watch=forever
@@ -31,7 +38,7 @@ live/sync_assets:
 
 # start all 4 watch processes in parallel
 dev:
-	make -j4 live/tailwind live/templ live/server live/sync_assets
+	make -j5 db/generate live/tailwind live/templ live/server live/sync_assets
 
 build:
 	go generate

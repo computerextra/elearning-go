@@ -8,7 +8,13 @@ import (
 )
 
 type Config struct {
-	PORT int `env:"PORT,required"`
+	DATABASE_URL  string `env:"DATABASE_URL,required"`
+	PORT          int    `env:"PORT,required"`
+	MAIL_FROM     string `env:"MAIL_FROM,required"`
+	MAIL_SERVER   string `env:"MAIL_SERVER,required"`
+	MAIL_PORT     int    `env:"MAIL_PORT,required"`
+	MAIL_USER     string `env:"MAIL_USER,required"`
+	MAIL_PASSWORD string `env:"MAIL_PASSWORD,required"`
 }
 
 func GetEnv() Config {
