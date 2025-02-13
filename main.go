@@ -1,35 +1,44 @@
-//go:generate npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/style.css --minify
-//go:generate templ generate
 package main
 
 import (
-	"computerextra/elaerning-go/internal/app"
-	"context"
-	"embed"
-	"log/slog"
-	"os"
-	"os/signal"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
 
-	"github.com/joho/godotenv"
+	"computerextra/elaerning-go/env"
+	"computerextra/elaerning-go/routes"
+
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
-//go:embed static
-var files embed.FS
-
 func main() {
-	godotenv.Load()
+	router := mux.NewRouter()
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	// Static Assets
+	var dir string
+	flag.StringVar(&dir, "dir", "./static", "the directory to serve files from. Defaults to the current dir")
+	flag.Parse()
 
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
-	app, err := app.New(logger, app.Config{}, files)
-	if err != nil {
-		logger.Error("failed to create app", slog.Any("error", err))
+	routes.GetRoutes(router)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+	})
+	handler := c.Handler(router)
+
+	env := env.GetEnv()
+
+	srv := &http.Server{
+		Handler:      handler,
+		Addr:         fmt.Sprintf(":%v", env.PORT),
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
 	}
 
-	if err := app.Start(ctx); err != nil {
-		logger.Error("failed to start app", slog.Any("error", err))
-	}
+	log.Fatal(srv.ListenAndServe())
 }
