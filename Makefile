@@ -20,6 +20,7 @@ db/generate:
 
 db/push:
 	go run github.com/steebchen/prisma-client-go db push
+	go run github.com/steebchen/prisma-client-go generate
 
 # run tailwindcss to generate style.css bundle in watch mode
 live/tailwind:
