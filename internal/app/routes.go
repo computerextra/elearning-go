@@ -21,6 +21,7 @@ func (a *App) loadPages(router *http.ServeMux) {
 		w.WriteHeader(http.StatusOK)
 	})
 }
+
 func (a *App) loadStaticFiles() (http.Handler, error) {
 	if os.Getenv("BUILD_MODE") == "develop" {
 		return http.FileServer(http.Dir("./static")), nil
