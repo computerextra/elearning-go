@@ -1,6 +1,9 @@
 # run air to detect any go file changes to re-build and re-run the server
-live/server:
-	go run github.com/cosmtrek/air@v1.51.0 
+live/server-windows:
+	go run github.com/cosmtrek/air@v1.51.0 -c .air.windows.toml
+
+live/server-mac:
+	go run github.com/cosmtrek/air@v1.51.0 -c .air.mac.toml
 # \
 # --build.full_bin "go build -o ./tmp/bin/main.exe" --build.bin "./tmp/bin/main.exe" --build.delay "100" \
 # --build.exclude_dir "node_modules" \
@@ -26,7 +29,10 @@ frontend/dev:
 
 # start all 4 watch processes in parallel
 dev:
-	make -j2 db/generate live/server
+	make -j2 db/generate live/server-windows
+
+devmac:
+	make -j2 db/generate live/server-mac
 
 build:
 	make frontend/build
