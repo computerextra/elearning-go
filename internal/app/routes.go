@@ -1,6 +1,7 @@
 package app
 
 import (
+	"computerextra/elaerning-go/internal/middleware"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -16,10 +17,16 @@ func (a *App) loadRoutes() (*mux.Router, error) {
 		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	})
 
+	r.Handle("/api/auth", middleware.VerifySessionToken(http.HandlerFunc(ProtectedHandler)))
+
 	spa := SpaHandler{staticPath: "dist", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
 
 	return r, nil
+}
+
+func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(map[string]bool{"auth": true})
 }
 
 type SpaHandler struct {
