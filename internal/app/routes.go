@@ -10,6 +10,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// TODO: Example user store (replace with database in production)
+var users = map[string]string{
+	"user1": "password1",
+	"user2": "password2",
+}
+
+type Credentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func (a *App) loadRoutes() (*mux.Router, error) {
 	r := mux.NewRouter()
 
@@ -18,6 +29,7 @@ func (a *App) loadRoutes() (*mux.Router, error) {
 	})
 
 	r.Handle("/api/auth", middleware.VerifySessionToken(http.HandlerFunc(ProtectedHandler)))
+	r.HandleFunc("/api/login", LoginHandler).Methods(http.MethodPost)
 
 	spa := SpaHandler{staticPath: "dist", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
@@ -32,6 +44,34 @@ func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 type SpaHandler struct {
 	staticPath string
 	indexPath  string
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var creds Credentials
+
+	err := json.NewDecoder(r.Body).Decode(&creds)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// TODO: Validate credentials (in real app, check against database)
+	expectedPassword, ok := users[creds.Username]
+	if !ok || expectedPassword != creds.Password {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	token, err := middleware.GenerateJWT(creds.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	// Return the token to the client
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"Authorization": token,
+	})
 }
 
 func (h SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
